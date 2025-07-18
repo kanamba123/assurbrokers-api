@@ -1,0 +1,31 @@
+name: Deploy PHP Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to VPS via SSH
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          DEPLOYMENT_DIRECTORY: /var/www/html/assurbrokers-api
+        run: |
+          echo "Déploiement vers $HOST..."
+          
+          # Nettoyage côté GitHub Actions runner (facultatif)
+          rm -rf .git .github node_modules package.json package-lock.json
+
+          # Envoi des fichiers vers le serveur distant via SSH
+          sshpass -p "$PASSWORD" rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./ "$USERNAME@$HOST:$DEPLOYMENT_DIRECTORY"
+
+          echo "Déploiement terminé avec succès ✅"
