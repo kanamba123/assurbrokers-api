@@ -10,34 +10,34 @@ class TemoignageController
         return json_response($temoignages);
     }
 
-   public static function getTemByPagination()
-{
-    $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
-    $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-    $offset = ($page - 1) * $limit;
+    public static function getTemByPagination()
+    {
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
 
-    // Récupérer les témoignages paginés
-    $temoignages = Temoignage::allTestimanyByPagination($limit, $offset);
+        // Récupérer les témoignages paginés
+        $temoignages = Temoignage::allTestimanyByPagination($limit, $offset);
 
-    // Récupérer le nombre total de témoignages pour calculer hasMore
-    global $pdo;
-    $countQuery = "SELECT COUNT(*) FROM temoignages";
-    $totalStmt = $pdo->query($countQuery);
-    $totalItems = (int) $totalStmt->fetchColumn();
+        // Récupérer le nombre total de témoignages pour calculer hasMore
+        global $pdo;
+        $countQuery = "SELECT COUNT(*) FROM temoignages";
+        $totalStmt = $pdo->query($countQuery);
+        $totalItems = (int) $totalStmt->fetchColumn();
 
-    $hasMore = $totalItems > $page * $limit;
+        $hasMore = $totalItems > $page * $limit;
 
-    // Retourner la structure attendue par React Query
-    $response = [
-        'items' => $temoignages,
-        'currentPage' => $page,
-        'limit' => $limit,
-        'totalItems' => $totalItems,
-        'hasMore' => $hasMore,
-    ];
+        // Retourner la structure attendue par React Query
+        $response = [
+            'items' => $temoignages,
+            'currentPage' => $page,
+            'limit' => $limit,
+            'totalItems' => $totalItems,
+            'hasMore' => $hasMore,
+        ];
 
-    return json_response($response);
-}
+        return json_response($response);
+    }
 
 
     public static function show($id)

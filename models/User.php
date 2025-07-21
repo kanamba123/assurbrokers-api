@@ -30,7 +30,7 @@ class User
         ");
 
         $stmt->execute([
-            $data['username'],
+            $data['email'],
             password_hash($data['password'], PASSWORD_BCRYPT),
             $data['email'],
             $data['role'] ?? 'courtier',

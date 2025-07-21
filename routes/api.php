@@ -54,17 +54,17 @@ $router->delete('/reseaux_sociaux/{id}', 'ReseauxSociauxController@destroy');
 
 
 //Point d'accee pour enregistrer le type d'assurance
-$router->post('/insurance_companies', 'InsuranceCompaniesController@store');
 $router->get('/insurance_companies', 'InsuranceCompaniesController@mich');
 
 
 //Point d'accee  type d'assurance
-$router->post('/insurance_type', 'InsuranceTypesController@store');
-$router->get('/insurance_type', 'InsuranceTypesController@index');
+$router->post('/insurance_types', 'InsuranceTypesController@store');
+$router->get('/insurance_types', 'InsuranceTypesController@index');
 
 //Point d'accee  type d'assurance
 $router->post('/company_products', 'CompanyProductsController@store');
 $router->get('/company_products', 'CompanyProductsController@index');
+$router->get('/company_products/client', 'CompanyProductsController@getTemByPagination');
 
 
 $router->get('/publications_pub', 'PublicationController@getPublicationPub');
@@ -76,8 +76,8 @@ $router->post('/contacts', 'MessageContactController@store');
 // =====================
 $router->group(['middleware' => 'JwtMiddleware'], function ($router) {
   // Users
-  
-$router->get('/clients', 'CustomerController@index');
+
+  $router->get('/clients', 'CustomerController@index');
   $router->get('/users', 'UserController@index');
   $router->get('/users/available-for-conversation', 'UserController@index');
   $router->get('/users/{id}', 'UserController@show');
@@ -152,6 +152,10 @@ $router->get('/clients', 'CustomerController@index');
   $router->delete('/publications/{id}', 'PublicationController@destroy');
   $router->post('/publications/upload-image', 'PublicationController@uploadImage');
 
+  //Point d'accee pour enregistrer le type d'assurance
+  $router->post('/company_products', 'CompanyProductsController@store');
+  $router->post('/company_products/upload-image', 'CompanyProductsController@uploadImage');
+
   // Profil
   $router->get('/profile', 'UserController@profile');
 
@@ -196,11 +200,9 @@ $router->get('/clients', 'CustomerController@index');
   $router->post('/connexions/clean-old', 'ConnexionController@cleanOld');
 
   //Message contact
-  $router->get('/contacts', 'MessageContactController@index');       
-  $router->get('/contacts/{id}', 'MessageContactController@show');    
+  $router->get('/contacts', 'MessageContactController@index');
+  $router->get('/contacts/{id}', 'MessageContactController@show');
   $router->delete('/contacts/{id}', 'MessageContactController@destroy');
-
-
 });
 
 // =====================

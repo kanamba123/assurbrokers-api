@@ -18,7 +18,7 @@ class Temoignage
         FROM 
             temoignages
         LEFT JOIN 
-            users ON temoignages.user_id = users.id
+            insurance_companies ON temoignages.user_id = insurance_companies.id
         ORDER BY 
             temoignages.date_posted	 DESC
     ";
@@ -54,15 +54,9 @@ class Temoignage
 
         $query = "
         SELECT 
-            temoignages.*,
-            users.id AS user_id,
-            users.name AS user_name,
-            users.email AS user_email,
-            users.image_profile AS profile
+            temoignages.*
         FROM 
             temoignages
-        LEFT JOIN 
-            users ON temoignages.user_id = users.id
         ORDER BY 
             temoignages.date_posted DESC
         LIMIT :limit OFFSET :offset
@@ -79,17 +73,10 @@ class Temoignage
             return [
                 'id' => $temoignage['id'],
                 'message' => $temoignage['message'],
-                'note' => $temoignage['note'],
                 'auteur' => $temoignage['auteur'],
                 'role' => $temoignage['role'],
                 'image' => $temoignage['image'],
-                'date_posted' => $temoignage['date_posted'],
-                'user' => $temoignage['user_id'] ? [
-                    'id' => $temoignage['user_id'],
-                    'name' => $temoignage['user_name'],
-                    'email' => $temoignage['user_email'],
-                    'profile' => $temoignage['profile'],
-                ] : null
+                'date_posted' => $temoignage['date_posted']
             ];
         }, $temoignages);
     }
@@ -105,23 +92,18 @@ class Temoignage
 
     public static function create($data)
     {
-        $currentUser = JwtMiddleware::getPayload();
-
-        $user_id = $currentUser['user_id'];
-        $user_role = $currentUser['role'];
+    
 
         global $pdo;
         $stmt = $pdo->prepare("
-            INSERT INTO temoignages (message,note,auteur,user_id,image,role)
-            VALUES (?, ?, ?,?, ?,?)
+            INSERT INTO temoignages (message,auteur,image,role)
+            VALUES (?, ?, ?, ?)
         ");
         $stmt->execute([
             $data['message'],
-            $data['note'],
             $data['auteur'],
-            $user_id,
             $data['image'],
-            $user_role
+            $data['role'],
         ]);
 
         return ['id' => $pdo->lastInsertId()] + $data;

@@ -180,7 +180,7 @@ public static function uploadImage()
             $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
             
             // Chemins sans échappement
-            $imagePath = '/gisaanalytica-api/public/uploads/publications/' . $filename;
+            $imagePath = '/assurbrokers-api/public/uploads/publications/' . $filename;
             $imageUrl = $protocol . $host . $imagePath;
 
             // Retourne la réponse sans échappement JSON

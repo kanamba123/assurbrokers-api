@@ -10,6 +10,30 @@ class CompanyProducts
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public static function allProductCampaniesByPagination($limit = 5, $offset = 0)
+    {
+        global $pdo;
+
+        $query = "
+        SELECT 
+            company_products.*
+        FROM 
+            company_products
+        ORDER BY 
+            company_products.created_at DESC
+        LIMIT :limit OFFSET :offset
+    ";
+
+        $stmt = $pdo->prepare($query);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $productsCampanies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $productsCampanies;
+    }
+
     public static function find($id)
     {
         global $pdo;
@@ -32,8 +56,8 @@ class CompanyProducts
 
         $stmt = $pdo->prepare("INSERT INTO company_products (
             company_id, type_id, product_code, name, description,
-            base_price, commission_rate, is_active, terms_conditions, garanties
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            base_price, commission_rate, is_active, terms_conditions, garanties,logo_path
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
 
         $stmt->execute([
             $data['company_id'],
@@ -46,6 +70,7 @@ class CompanyProducts
             $data['is_active'] ?? 1,
             $data['terms_conditions'] ?? null,
             $data['garanties'] ?? null,
+            $data['image_path'] ?? null,
         ]);
 
         return self::find($pdo->lastInsertId());
@@ -59,8 +84,16 @@ class CompanyProducts
         $params = [];
 
         $allowedFields = [
-            'company_id', 'type_id', 'product_code', 'name', 'description',
-            'base_price', 'commission_rate', 'is_active', 'terms_conditions', 'garanties'
+            'company_id',
+            'type_id',
+            'product_code',
+            'name',
+            'description',
+            'base_price',
+            'commission_rate',
+            'is_active',
+            'terms_conditions',
+            'garanties'
         ];
 
         foreach ($allowedFields as $field) {

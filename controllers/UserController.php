@@ -22,7 +22,7 @@ class UserController
     {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        $required = ['username', 'email', 'password'];
+        $required = [ 'email', 'password'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 return json_response(['error' => "Le champ $field est obligatoire"], 400);
