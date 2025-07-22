@@ -10,34 +10,51 @@ class TemoignageController
         return json_response($temoignages);
     }
 
-    public static function getTemByPagination()
-    {
-        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
-        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-        $offset = ($page - 1) * $limit;
+  public static function getTemByPagination()
+{
+    $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 5;
+    $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+    $offset = ($page - 1) * $limit;
 
-        // Récupérer les témoignages paginés
-        $temoignages = Temoignage::allTestimanyByPagination($limit, $offset);
+    $maxAllowedItems = 8;
 
-        // Récupérer le nombre total de témoignages pour calculer hasMore
-        global $pdo;
-        $countQuery = "SELECT COUNT(*) FROM temoignages";
-        $totalStmt = $pdo->query($countQuery);
-        $totalItems = (int) $totalStmt->fetchColumn();
+    // Récupérer le nombre réel de témoignages
+    global $pdo;
+    $countQuery = "SELECT COUNT(*) FROM temoignages";
+    $totalStmt = $pdo->query($countQuery);
+    $realTotalItems = (int) $totalStmt->fetchColumn();
 
-        $hasMore = $totalItems > $page * $limit;
+    // Appliquer la limite de 12 max
+    $totalItems = min($realTotalItems, $maxAllowedItems);
 
-        // Retourner la structure attendue par React Query
-        $response = [
-            'items' => $temoignages,
+    // Si l'offset dépasse les 12 premiers témoignages, retourner une page vide
+    if ($offset >= $totalItems) {
+        return json_response([
+            'items' => [],
             'currentPage' => $page,
             'limit' => $limit,
             'totalItems' => $totalItems,
-            'hasMore' => $hasMore,
-        ];
-
-        return json_response($response);
+            'hasMore' => false,
+        ]);
     }
+
+    // Calcul du limit restant si proche de la limite max
+    $adjustedLimit = min($limit, $totalItems - $offset);
+
+    // Récupérer les témoignages dans la limite autorisée
+    $temoignages = Temoignage::allTestimanyByPagination($adjustedLimit, $offset);
+
+    $hasMore = ($offset + $adjustedLimit) < $totalItems;
+
+    return json_response([
+        'items' => $temoignages,
+        'currentPage' => $page,
+        'limit' => $adjustedLimit,
+        'totalItems' => $totalItems,
+        'hasMore' => $hasMore,
+    ]);
+}
+
 
 
     public static function show($id)

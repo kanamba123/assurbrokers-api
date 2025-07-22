@@ -65,6 +65,7 @@ $router->get('/insurance_types', 'InsuranceTypesController@index');
 $router->post('/company_products', 'CompanyProductsController@store');
 $router->get('/company_products', 'CompanyProductsController@index');
 $router->get('/company_products/client', 'CompanyProductsController@getTemByPagination');
+$router->get('/company_products_pag_inf/client', 'CompanyProductsController@getTemByInfinityPagination');
 
 
 $router->get('/publications_pub', 'PublicationController@getPublicationPub');

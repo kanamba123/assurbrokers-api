@@ -39,6 +39,32 @@ class CompanyProductsController
         return json_response($companyProducts);
     }
 
+    public static function getTemByInfinityPagination()
+    {
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 3;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        $companyProducts = CompanyProducts::allProductCampaniesByPagination($limit, $offset);
+
+        global $pdo;
+        $countQuery = "SELECT COUNT(*) FROM company_products";
+        $totalStmt = $pdo->query($countQuery);
+        $totalItems = (int) $totalStmt->fetchColumn();
+
+        $hasMore = $totalItems > $page * $limit;
+
+        $response = [
+            'items' => $companyProducts,
+            'currentPage' => $page,
+            'limit' => $limit,
+            'totalItems' => $totalItems,
+            'hasMore' => $hasMore,
+        ];
+
+        return json_response($response);
+    }
+
     public function show($id)
     {
         $product = CompanyProducts::find($id);
